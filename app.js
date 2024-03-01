@@ -1,6 +1,7 @@
 // Middleware declarations
 
 const express = require("express");
+// const path = require("path");
 
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
@@ -44,6 +45,8 @@ app.set(`view engine`, `ejs`);
 
 // USE declarations
 
+app.use(express.static('public'));
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
@@ -58,13 +61,16 @@ async function StartServer(){
         // GET declarations
 
         app.get("/", (req, res)=> {
-            res.render(`index.ejs`);
+            res.render(`index`);
         });
 
         app.get("/register", (req, res) =>{
-            res.render(`signupPage.ejs`);
+            res.render(`signupPage`);
         });
 
+        app.get("/passwordreset", (req, res)=>{
+            res.render(`passwordreset.ejs`)
+        })
         // POST declarations
 
         app.post("/register", async (req, res) => {
