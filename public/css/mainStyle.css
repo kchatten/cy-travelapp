@@ -1,0 +1,117 @@
+body {
+  font-family: 'Inter';
+  font-size: 22px;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: white;
+  align-content: center;
+}
+
+
+.container {
+  width: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+ 
+h1, h2, h3, h4, h5, h6 {
+  margin: 5px;
+  padding: 0;
+}
+
+label{
+border: 0;
+clip: rect(1px, 1px, 1px, 1px);
+clip-path: inset(50%);
+height: 1px;
+margin: -1px;
+overflow: hidden;
+padding: 0;
+position: absolute;
+width: 1px;
+word-wrap: normal !important;
+}
+
+form {
+background-color: white;
+padding: 10px;
+border-radius: 8px;
+width: 350px;
+text-align: center;
+}
+
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select {
+  width: calc(100% - 20px);
+  margin: 10px 0;
+  padding: 10px;
+  border: 1.5px solid black;
+  border-radius: 4px;
+  box-sizing: border-box;
+  background-color: white;
+}
+  
+button[type="submit"] {
+font-family: 'Inter';
+width: 100%;
+background-color: #F7FB3C;
+color: black;
+font-weight: bold;
+padding: 10px 0;
+margin: 20px;
+border: none;
+border-radius: 4px;
+cursor: pointer;
+width: 250px;
+}
+  
+input[type="submit"]:hover {
+background-color: #F7FB3C;
+}
+  
+.-link {
+  font-family: 'Inter';
+  font-size: 16px;
+  text-align: center;
+  padding-bottom: 20px;
+  margin: 0;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  }
+
+
+.-link {
+text-align: center;
+}
+  
+.link p {
+margin: 0;
+}
+  
+.-link a {
+color: black;
+text-decoration: none;
+font-weight: bold;
+}
+  
+.-link a:hover {
+text-decoration: underline;
+}
+
+.logo {
+z-index: 9999; /* Ensure the logo is above other content */
+width: 50px;
+border-radius: 10px;
+}
