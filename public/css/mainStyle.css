@@ -9,7 +9,12 @@ body {
   height: 100vh;
   background-color: white;
   align-content: center;
+
+  /*Prevent scrollbars*/
+  overflow-y: hidden;
+  overflow-x: hidden;
 }
+
 
 
 .container {
@@ -114,4 +119,69 @@ text-decoration: underline;
 z-index: 9999; /* Ensure the logo is above other content */
 width: 50px;
 border-radius: 10px;
+}
+
+
+
+/* This section of mainstyle.css is related to styling the Navigation bar (Navbar)*/
+
+#nav-organizer{
+  position: absolute;
+  right: -984px;
+
+  display: flex;
+  background-color: transparent;
+  height: 100%;
+
+  box-sizing: border-box;
+
+  transition: right 0.3s ease;
+}
+
+#navbar{ /* The transparent container that holds our nav buttons.*/
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; 
+  align-items: flex-end;
+  position: relative;
+  box-sizing: border-box;
+  height: 100%;
+  width: 10%;
+}
+
+.--navbutton{ /* Styling related to the buttons that popout the content container.*/
+  margin-top: 5px;
+  margin-bottom: 5px;
+
+  /* Positiosn the yellow border of the button over the black border of the content container*/
+  z-index: 1;
+  margin-right: -5px;
+  
+  height: 150px;
+  width: 100px;
+  border: 4px solid black;
+  border-right: 4px solid #F7FB3C ;
+  background-color: #F7FB3C;
+  box-sizing: border-box;
+}
+
+
+
+#content-container{ /*The dynamic container that is hidden offscreen to be prompted by the user.*/
+  
+  position: relative !important;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  width: 1000px;
+  height: 100%;
+  background-color: #F7FB3C;
+  border-left: 4px solid black;
+
+  box-sizing: border-box; 
+
+
 }

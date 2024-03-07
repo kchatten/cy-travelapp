@@ -1,4 +1,4 @@
-const { usersCollection } = require('./app.js');
+//const { usersCollection } = require('./app.js');
 
 document.getElementById('recovery-type').addEventListener('change', function(event) {
  
@@ -61,7 +61,7 @@ document.getElementById('email-change-form').addEventListener('submit', async fu
 
   var passwordToCheckAgainst = await usersCollection.find();
 
-  if ()
+  //if ()
 
   console.log('DEBUG: Form submitted.');
   document.getElementById('email-change-form').submit(); // Submit the form.

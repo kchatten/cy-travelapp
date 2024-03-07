@@ -167,13 +167,13 @@ async function StartServer(){
             }
         });
 
-        app.post("/accountrecovery/changepassword", (req, res) =>{
+        app.put("/accountrecovery/changepassword", (req, res) =>{
 
             const { oldPassword, newPassword } = req.body;
 
         });
 
-        app.post("/accountrecovery/changeemail", (req, res) =>{
+        app.put("/accountrecovery/changeemail", (req, res) =>{
 
             const { oldEmail, newEmail } = req.body;
 
