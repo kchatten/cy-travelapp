@@ -1,16 +1,14 @@
 // Middleware declarations
 
 const express = require("express");
-// const path = require("path");
-
-const bcrypt = require("bcrypt");
-const saltRounds = 10;
-
 
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const bodyParser = require("body-parser");
+
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 
 // MongoDB declarations
@@ -19,10 +17,10 @@ const { MongoClient } = require("mongodb");
 const uri = 'mongodb+srv://admin:cytravelapp@cluster0.e2ggebk.mongodb.net/';
 const client = new MongoClient(uri);
 
-const userSchema = new Schema ({
-name: String,
-email: String,
-password: String // Password must be hashed.
+const userSchema = new Schema({
+    name: String,
+    email: String,
+    password: String // Password must be hashed.
 });
 
 let usersCollection;
@@ -56,65 +54,50 @@ app.use(bodyParser.json());
 
 // TO ENSURE ALL ROUTES CAN ESTABLISH CORRECTLY WE MUST WAIT FOR MONGODB TO ESTABLISH.
 
-async function StartServer(){
-    try{
+async function StartServer() {
+    try {
         await ConnectToMongoDB();
 
-        
-        
         // ALL ROUTES SHOULD GO HERE
-        
-
 
         // GET declarations
 
-        app.get("/", (req, res)=> {
+        app.get("/", (req, res) => {
             res.render(`index`);
         });
-
-        app.get("/register", (req, res) =>{
-            res.render(`signupPage`);
-        });
-
-        app.get("/accountrecovery", (req, res)=>{
-            res.render(`accountRecovery`)
-        })
-
-
-
-
 
 
         // POST declarations
 
-        app.post("/register", async (req, res) => {
+        app.post("/register", async (req, res) => { // This request is sent from registration.js
             try {
-                const { name, email, password, location } = req.body; // Declare the variables we are expecting to insert into the database.
+                const { name, email, password, location } = req.body; // At this path we are expecting a name, an email, a sha256 hashed password and a location.
+
+                const cursor = await usersCollection.find({ email: email }); // Compare the email from our request against our database. This returns a cursor.
+                const result = await cursor.toArray(); // To access the values within the cursor we must turn it into an array.
         
-                const cursor = await usersCollection.find({ email: email }); // Recieve a cursor, the cursor contains the result of email:email, which is to say we are searching the database with the expected email variable. If we find it, it will be returned in the cursor.
-                const result = await cursor.toArray(); // To access the properties of the cursor we must turn it into an array.
-        
-                if (result.length > 0) { // If we find that there is characters in the result of the cursor that means an email of that designation already exists within the database. 
-                    console.log("Email already exists, redirecting user back to the login page.");
-                    return res.status(409).redirect("/login"); // Status Code 409 is a conflict error.
-                } else { // If no characters are in the result of the cursor that means the email does not already exist within the database so we continue with registration.
-                    bcrypt.hash(password, saltRounds, async function(err, hashedPassword) {  // This function hashes the hashed password we recieve from the client for more secure storage.
-                        if (err) {
+                if (result.length > 0) { // If the length of our result is greater than 0, that indicates that we have found a matching email.
+                    console.log("Email already exists");
+                    return res.status(409).send('An account with that email already exists.'); // Send a conflict error status code with the appropriate error message we wish to display to the user.
+                } else { // The length of result is 0 which indicates there are no matching emails in our database.
+                  
+                    bcrypt.hash(password, saltRounds, async function (err, hashedPassword) {   // Use bcrypt to hash the password of our request. Store that hashed result as the hashedPassword variable.
+                        if (err) { // Handle the error gracefully.
                             console.error("Error hashing password:", err);
-                            return res.status(500).send("An error occurred while registering the user."); // Status code 500 is an internal server error.
-                        }
-                        try {
-                            const resultToInsert = await usersCollection.insertOne({
+                            return res.status(500).send("An error occurred while hashing the password."); // This should never happen, it indicates a critical error with the bcrypt module. Ensure that bcrypt is up to date and appropriately required at the top of this script, that saltRounds is appropriately defined and that the password variable is correctly being passed from registration.js as a sha256 string.
+                        }      
+                        try { // Attempt to write to our database.
+                            const resultToInsert = await usersCollection.insertOne({ // Debugging information, technically we can remove 'const resultToInsert = await' and just run the mongosh command collName.insertOne to insert the information into the database.
                                 name: name,
                                 email: email,
                                 password: hashedPassword,
                                 location: location
                             });
-                            console.log(`User ${name} inserted into the database successfully under id ${resultToInsert.insertedId}, with password: ${password} their email is: ${email} and they are from: ${location} redirecting user to homepage.`);
-                            res.status(200).redirect("/"); // Status code 200 indicates a success.
+                            console.log(`User ${name} inserted into the database successfully under id ${resultToInsert.insertedId} with the following inputs: ${name}, ${email}, ${password}, ${hashedPassword}, ${location}`);
+                            res.status(200).send(); // Send n empty body to complete the request. 
                         } catch (error) {
-                            console.error("Error writing to database, registration unsuccessful. Reason: ", error);
-                            res.status(500).send("An error occurred while registering the user.");
+                            console.error("Error writing to database, registration unsuccessful. Reason:", error);
+                            res.status(500).send("An error occurred while registering the user."); // The only error we should experience is a 500 internal error which is a result of an error connecting to our database.
                         }
                     });
                 }
@@ -124,66 +107,62 @@ async function StartServer(){
             }
         });
         
-        app.post("/login", async (req, res) => {
-            try {
-                // Pull the login form data from our request body.
-                const { emaillogin, passwordlogin } = req.body;
 
-                // Find documents matching the query. MongoDB returns .find() objects as a cursor which must be converted into an array.
-                const cursor = usersCollection.find({ email: emaillogin });
-                
-                // Convert the cursor to an array of documents
-                const result = await cursor.toArray();
-                
-                // If the length of our result is greater than 0, the email was found in usersCollection.
-                if (result.length > 0) {
-                    console.log('User found:', result);
-                    
-                    const user = result[0]; // This should only ever return one result in the index so we are asking for the first result.
-                    const pass = user.password; // Set the password to match, to the password stored in the database for that particular user.
+        // app.post("/login", async (req, res) => { TODO: Ensure passwords are matching, this means that we are taking the users input as a sha256 hashed string, hashing that with bcrypt and then comparing the value against the stored value, as we are storing a bcrypt hashed sha256 hashed string, if the saltRounds variable is not the same as when the account was created this will error.
+        //     try {            
+        //         const { emaillogin, passwordlogin } = req.body; // Pull the login form data from our request body.
+        //         const cursor = usersCollection.find({ email: emaillogin }); // Find documents matching the query. MongoDB returns .find() objects as a cursor which must be converted into an array.        
+        //         const result = await cursor.toArray(); // Convert the cursor to an array of documents
 
-                    // DEBUGGING
-                    console.log(pass) 
-                    console.log(passwordlogin)
+        //         // If the length of our result is greater than 0, the email was found in usersCollection.
+        //         if (result.length > 0) {
+        //             console.log('User found:', result);
 
-                    // Perform further authentication logic here.
+        //             const user = result[0]; // This should only ever return one result in the index so we are asking for the first result.
+        //             const pass = user.password; // Set the password to match, to the password stored in the database for that particular user.
 
-                    if(passwordlogin === pass) {
-                        console.log("Passwords are matching, logging user in.")
-                        res.status(200).redirect("/");
-                    }
-                    else{
-                        console.log("Passwords are not matching, redirect the user back to the login page.")
-                        res.status(404).redirect("/login");
-                    }
-                } else {
-                    console.log('Email not found, redirecting the user back to the login page.');
-                    // Display error codes appropriate to the error ie wrong password, no email etc.
-                    res.status(404).redirect("/login");
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                res.status(500).redirect("/");
-            }
-        });
+        //             // DEBUGGING
+        //             console.log(pass)
+        //             console.log(passwordlogin)
 
-        app.put("/accountrecovery/changepassword", (req, res) =>{
+        //             // Perform further authentication logic here.
 
-            const { oldPassword, newPassword } = req.body;
+        //             if (passwordlogin === pass) {
+        //                 console.log("Passwords are matching, logging user in.")
+        //                 res.status(200).redirect("/");
+        //             }
+        //             else {
+        //                 console.log("Passwords are not matching, redirect the user back to the login page.")
+        //                 res.status(404).redirect("/login");
+        //             }
+        //         } else {
+        //             console.log('Email not found, redirecting the user back to the login page.');
+        //             // Display error codes appropriate to the error ie wrong password, no email etc.
+        //             res.status(404).redirect("/login");
+        //         }
+        //     } catch (error) {
+        //         console.error('Error:', error);
+        //         res.status(500).redirect("/");
+        //     }
+        // });
 
-        });
+        // app.put("/accountrecovery/changepassword", (req, res) => { TODO AFTER LOGIN IS SETUP.
 
-        app.put("/accountrecovery/changeemail", (req, res) =>{
+        //     const { oldPassword, newPassword } = req.body;
 
-            const { oldEmail, newEmail } = req.body;
+        // });
 
-        });
-        
+        // app.put("/accountrecovery/changeemail", (req, res) => { TODO AFTER LOGIN IS SETUP
+
+        //     const { oldEmail, newEmail } = req.body;
+
+        // });
+
         app.listen(port, () => {
             console.log(`Server started successfully. Listening on port: ${port}`)
         });
 
-    } catch (err){
+    } catch (err) {
         console.error("Error starting server: ", err);
     }
 }

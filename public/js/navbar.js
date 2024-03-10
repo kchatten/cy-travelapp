@@ -1,5 +1,3 @@
-
-
 const container = document.getElementById('nav-organizer');
 const contentContainer = document.getElementById('content-container');
 
@@ -28,7 +26,6 @@ container.addEventListener('transitionend', () => {
 });
 
 function WipeContainer() {
-
     console.log(`DEBUG: Wiping container...`)
     contentContainer.innerHTML = '';
 }

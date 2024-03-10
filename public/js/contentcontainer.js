@@ -1,35 +1,37 @@
 import { isOpen } from './navbar.js';
 
+import { InitializeRegistrationLogic } from './registration.js';
+
 const contentContainer = document.getElementById('content-container');
 
 let lastButtonId = null;
 
+function UpdateContent(buttonId, result) { // The function to update our dynamic content container, it takes in an input parameter of the id of the button clicked and outputs a result. I actually do not now why this works. Reading it as written, if the updateContent resolves successfully, it then proceeds to check the id of the button. If it fails, it wipes the screen and then checks the id of the button. If you remove the WupeContainer() from the else, forms will not be removed when navigating between tabs and they will inappropriately appear stacked within the content container,
 
-function UpdateContent(buttonId, result) {
     console.log(`DEBUG: running UpdateContent function with input parameter ${buttonId}`);
     console.log(`DEBUG: ${lastButtonId}`)
 
-    if (result) {
-        if (buttonId === "register" || buttonId === "registerLink") {
+    if (result) { // Updates the container while it is offscreen.
+        if (buttonId === "register" || buttonId === "registerLink") { // When we wish to update the container with content relevant to the registration 'page'.
             console.log('DEBUG: Displaying registration tab.');
+            UpdateContainerRegister(); // Update the content of the container to display the registration 'page'.
+            LoadRegistrationLogic(); // Load the registration logic after the content has been updated.
 
-            UpdateContainerRegister();
-
-        } else if (buttonId === "login") {
+        } else if (buttonId === "login") { // When we wish to update the container with the content relevant to the login 'page'.
             console.log(`DEBUG: Displaying login tab.`);
-            UpdateContainerLogin();
+            UpdateContainerLogin(); // Update the content of the container to display the login 'page'.
 
-        } else if (buttonId === "accountrecovery") {
+        } else if (buttonId === "accountrecovery") { // When we wish to update the container with the content relevant to the account recovery 'page'.
             console.log(`DEBUG: Displaying Account Recovery Tab`);
-
-            UpdateContainerRecovery()
+            UpdateContainerRecovery() // Update the content of the container to display the account recovery 'page'.
         }
-    } else {
+    } else { // Updates the container while it is onscreen.
         WipeContainer();
         if (buttonId === "register" || buttonId === "registerLink") {
             console.log('DEBUG: Displaying registration tab.');
 
             UpdateContainerRegister();
+            LoadRegistrationLogic();
 
         } else if (buttonId === "login") {
             console.log(`DEBUG: Displaying login tab.`);
@@ -42,52 +44,37 @@ function UpdateContent(buttonId, result) {
         }
     }
 }
-
-function ToggleContainer(buttonId) {
-    const container = document.getElementById('nav-organizer');
-    const rightPosition = parseInt(container.style.right || '0');
-
-    if (buttonId === lastButtonId) {
-        // If the buttonId matches the lastButtonId
-        // It means the user is trying to close the container
-        if (isOpen) {
+function ToggleContainer(buttonId) { // The function to toggle the container, it takes an input paremeter of the id of the button clicked.
+    const container = document.getElementById('nav-organizer'); // Grab the navigational organizer.
+    if (buttonId === lastButtonId) { // If the buttonId matches the lastButtonId, the user is trying to minimize the container.    
+        if (isOpen) { // Check the status of isOpen, if it resolves as true, the container is open.
             container.style.right = '-984px'; // Close the container
             console.log('DEBUG: Closing container...');
-        } else {
+        } else { // isOpen resolved as false, the container is closed.
             container.style.right = '0'; // Open the container
             console.log('DEBUG: Opening container...');
         }
     } else {
-        // If the buttonId does not match the lastButtonId
-        // It means the user is trying to navigate within the container
+        // If the buttonId does not match the lastButtonId, the user is trying to display the container.
         container.style.right = '0'; // Open the container
         console.log('DEBUG: Opening container...');
-    }
-
-    // Update lastButtonId after processing
-    lastButtonId = buttonId;
+    }    
+    lastButtonId = buttonId; // Update lastButtonId.
 }
-function WipeContainer() {
-
+function WipeContainer() { // The function for removing all content in the dynamic content container.
     console.log(`DEBUG: Wiping container...`)
     contentContainer.innerHTML = '';
 }
+function UpdateContainerRegister() { // The function for updating the content in the dynamic content container to display the registration 'page'
 
-function UpdateContainerRegister() {
+    const registrationContainer = document.createElement('div'); // Create container div
+    registrationContainer.classList.add('container'); // Give it the class .container for styling purposes.
 
-    // Grab the content container.
-    const container = document.getElementById('nav-organizer');
-
-    // Create container div
-    const registrationContainer = document.createElement('div');
-    registrationContainer.classList.add('container');
-
-    // Create form element
-    const form = document.createElement('form');
-    form.id = 'signup-form';
-    form.action = '/register';
-    form.method = 'POST';
-    registrationContainer.appendChild(form);
+    const registrationForm = document.createElement('form'); // Create form element
+    registrationForm.id = 'registration-form'; // Give it an id
+    registrationForm.action = '/register'; // Define the endpoint.
+    registrationForm.method = 'POST'; // Define the method
+    registrationContainer.appendChild(registrationForm); // Attach the registration form to the registration container.
 
     // Create titleplate div
     const titleplate = document.createElement('div');
@@ -96,7 +83,7 @@ function UpdateContainerRegister() {
     titleplate.style.flexDirection = 'column';
     titleplate.style.alignItems = 'center';
     titleplate.marginBottom = '10px';
-    form.appendChild(titleplate);
+    registrationForm.appendChild(titleplate);
 
     // Create image element
     const logo = document.createElement('img');
@@ -108,69 +95,75 @@ function UpdateContainerRegister() {
     // Create h3 element
     const heading3 = document.createElement('h3');
     heading3.textContent = 'Sign up for an account';
-    form.appendChild(heading3);
+    registrationForm.appendChild(heading3);
 
     // Create h6 element
     const heading6 = document.createElement('h6');
     heading6.textContent = 'Travel near. Travel far.';
-    form.appendChild(heading6);
+    registrationForm.appendChild(heading6);
 
     // Create label and input elements for Full Name
     const labelFullName = document.createElement('label');
     labelFullName.textContent = 'Full Name:';
-    form.appendChild(labelFullName);
+    registrationForm.appendChild(labelFullName);
+
     const inputFullName = document.createElement('input');
     inputFullName.type = 'text';
     inputFullName.id = 'name';
     inputFullName.name = 'name';
     inputFullName.placeholder = 'Your Name';
-    form.appendChild(inputFullName);
+    registrationForm.appendChild(inputFullName);
 
     // Create label and input elements for Email
     const labelEmail = document.createElement('label');
     labelEmail.textContent = 'Email:';
-    form.appendChild(labelEmail);
+    registrationForm.appendChild(labelEmail);
+
     const inputEmail = document.createElement('input');
     inputEmail.type = 'email';
     inputEmail.id = 'email';
     inputEmail.name = 'email';
     inputEmail.placeholder = 'Your Email';
-    form.appendChild(inputEmail);
+    registrationForm.appendChild(inputEmail);
 
     // Create label and input elements for Password
     const labelPassword = document.createElement('label');
     labelPassword.textContent = 'Password:';
-    form.appendChild(labelPassword);
+    registrationForm.appendChild(labelPassword);
+
     const inputPassword = document.createElement('input');
     inputPassword.type = 'password';
     inputPassword.id = 'password';
     inputPassword.name = 'password';
     inputPassword.placeholder = 'Your Pa****rd';
-    form.appendChild(inputPassword);
+    registrationForm.appendChild(inputPassword);
 
     // Create label and input elements for Location
     const labelLocation = document.createElement('label');
     labelLocation.textContent = 'Location:';
-    form.appendChild(labelLocation);
+    registrationForm.appendChild(labelLocation);
+
     const inputLocation = document.createElement('input');
     inputLocation.type = 'text';
     inputLocation.id = 'location';
     inputLocation.name = 'location';
     inputLocation.placeholder = 'Where ya from?';
-    form.appendChild(inputLocation);
+    registrationForm.appendChild(inputLocation);
 
     // Create error message div
     const errorMessage = document.createElement('div');
     errorMessage.id = 'error-message';
     errorMessage.style.color = 'red';
     errorMessage.style.fontSize = '16px';
-    form.appendChild(errorMessage);
+    registrationForm.appendChild(errorMessage);
 
     // Create submit button
     const submitButton = document.createElement('button');
     submitButton.type = 'submit';
     submitButton.textContent = 'Submit';
-    form.appendChild(submitButton);
+    registrationForm.appendChild(submitButton);
+
+
 
     // Create login button
     const loginButton = document.createElement('button');
@@ -197,19 +190,11 @@ function UpdateContainerRegister() {
     // Append container to the contentContainer
     contentContainer.appendChild(registrationContainer);
 
-    // Add event listener to the registration form if needed
-    const registrationForm = document.getElementById('signup-form');
     registrationForm.addEventListener('submit', function (event) {
         event.preventDefault();
-        // Handle form submission logic
-        console.log(`DEBUG: Attempting to register..`);
-    });
+    });  
 }
-
-function UpdateContainerLogin() {
-
-    // Grab the content container.
-    const container = document.getElementById('nav-organizer');
+function UpdateContainerLogin() { // The function for updating the content in the dynamic content container to display the login 'page'
 
     // Create container div
     const loginContainer = document.createElement('div');
@@ -253,6 +238,7 @@ function UpdateContainerLogin() {
     const labelLoginEmail = document.createElement('label');
     labelLoginEmail.textContent = 'Email:';
     loginForm.appendChild(labelLoginEmail);
+
     const loginEmailInput = document.createElement('input');
     loginEmailInput.type = 'email';
     loginEmailInput.id = 'email';
@@ -264,6 +250,7 @@ function UpdateContainerLogin() {
     const labelLoginPassword = document.createElement('label');
     labelLoginPassword.textContent = 'Password:';
     loginForm.appendChild(labelLoginPassword);
+
     const loginPasswordInput = document.createElement('input');
     loginPasswordInput.type = 'password';
     loginPasswordInput.id = 'password';
@@ -317,8 +304,7 @@ function UpdateContainerLogin() {
         console.log(`DEBUG: Attempting to log in..`);
     });
 }
-
-function UpdateContainerRecovery() {
+function UpdateContainerRecovery() { // The function for updating the content in the dynamic content container to display the account recovery 'page'
 
     // Create recovery type form
     const recoveryTypeForm = document.createElement('form');
@@ -512,6 +498,13 @@ function UpdateContainerRecovery() {
     signUpLink.style.border = 'none';
     linkParagraph.appendChild(signUpLink);
 
+    // Create error message div
+    const errorMessage = document.createElement('div');
+    errorMessage.id = 'error-message';
+    errorMessage.style.color = 'red';
+    errorMessage.style.fontSize = '16px';
+    recoveryTypeForm.appendChild(errorMessage);
+
 
     // Add event listener to the sign up link
     signUpLink.addEventListener('click', function () {
@@ -520,23 +513,21 @@ function UpdateContainerRecovery() {
         UpdateContent('registerLink');
     });
 }
-
-
-
-document.addEventListener('DOMContentLoaded', function () {
-    const container = document.getElementById('nav-organizer');
-    let buttons = container.querySelectorAll('button');
-    buttons.forEach(function (button) {
-        button.addEventListener('click', function () {
-            // Pass UpdateContent as the callback to ToggleContainer
-            UpdateContent(button.id);
-            ToggleContainer(button.id);
+function LoadRegistrationLogic() { // The function that calls for the initialization of our registration logic. We call it again here so that we can better control timing between the creation of the form and the initialization of the logic ensuring that all necessary elements are created before they are requested.
+    InitializeRegistrationLogic();
+}
+document.addEventListener('DOMContentLoaded', function () { // Listen for the page to load.
+    const container = document.getElementById('nav-organizer'); // Grab the navigational organizer (a transparent div element that contains our navigational buttons.)
+    let buttons = container.querySelectorAll('button'); // Grab all buttons within that container.
+    buttons.forEach(function (button) { // For every button within the buttons array, run a function.
+        button.addEventListener('click', function () { // Add an event listener to the button that listens for a click event and runs a function.            
+            UpdateContent(button.id); // Run the UpdateContent function with a paremeter of the id of the button that the user clicked.
+            ToggleContainer(button.id); // Run the ToggleContainer function with a paremter of the id of the button that the user clicked.
         });
     });
 });
 
-// Listen for the toggleContainerResult event
-document.addEventListener('toggleContainerResult', function (event) {
+document.addEventListener('toggleContainerResult', function (event) { // Listen for the toggleContainerResult event
     const result = event.detail;
 
     if (result) {
