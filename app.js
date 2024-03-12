@@ -28,7 +28,7 @@ let usersCollection;
 async function ConnectToMongoDB() {
     try {
         await client.connect();
-        const database = client.db('users');
+        const database = client.db('cyta');
         usersCollection = database.collection('users');
         console.log('Connected to MongoDB');
     } catch (error) {
@@ -93,7 +93,7 @@ async function StartServer() {
                                 password: hashedPassword,
                                 location: location
                             });
-                            console.log(`User ${name} inserted into the database successfully under id ${resultToInsert.insertedId} with the following inputs: ${name}, ${email}, ${password}, ${hashedPassword}, ${location}`);
+                            console.log(`DEBUG: User ${name} inserted into the database successfully under id ${resultToInsert.insertedId} with the following inputs: ${name}, ${email}, ${password}, ${hashedPassword}, ${location}`);
                             res.status(200).send(); // Send n empty body to complete the request. 
                         } catch (error) {
                             console.error("Error writing to database, registration unsuccessful. Reason:", error);
@@ -108,44 +108,48 @@ async function StartServer() {
         });
         
 
-        // app.post("/login", async (req, res) => { TODO: Ensure passwords are matching, this means that we are taking the users input as a sha256 hashed string, hashing that with bcrypt and then comparing the value against the stored value, as we are storing a bcrypt hashed sha256 hashed string, if the saltRounds variable is not the same as when the account was created this will error.
-        //     try {            
-        //         const { emaillogin, passwordlogin } = req.body; // Pull the login form data from our request body.
-        //         const cursor = usersCollection.find({ email: emaillogin }); // Find documents matching the query. MongoDB returns .find() objects as a cursor which must be converted into an array.        
-        //         const result = await cursor.toArray(); // Convert the cursor to an array of documents
+        app.post("/login", async (req, res) => { 
+            try{
+                const { email, password } = req.body; // Pull the login form data from our request body.
+                const cursor = usersCollection.find({ email: email }); // Find documents matching the query. MongoDB returns .find() objects as a cursor which must be converted into an array.        
+                const result = await cursor.toArray(); // Convert the cursor to an array of documents
 
-        //         // If the length of our result is greater than 0, the email was found in usersCollection.
-        //         if (result.length > 0) {
-        //             console.log('User found:', result);
+                // If the length of our result is greater than 0, the email was found in usersCollection.
+                if (result.length > 0) {
+                    console.log('User found:', result);
+                    
+                    const user = result[0]; // This should only ever return one result in the index so we are asking for the first result.
+                    const passwordToCheckAgainst = user.password; // Set the password to match, to the password stored in the database for that particular user.
 
-        //             const user = result[0]; // This should only ever return one result in the index so we are asking for the first result.
-        //             const pass = user.password; // Set the password to match, to the password stored in the database for that particular user.
+                    // DEBUGGING
+                    console.log(passwordToCheckAgainst)
+                    console.log(password)
 
-        //             // DEBUGGING
-        //             console.log(pass)
-        //             console.log(passwordlogin)
+                    // Perform further authentication logic here.
 
-        //             // Perform further authentication logic here.
-
-        //             if (passwordlogin === pass) {
-        //                 console.log("Passwords are matching, logging user in.")
-        //                 res.status(200).redirect("/");
-        //             }
-        //             else {
-        //                 console.log("Passwords are not matching, redirect the user back to the login page.")
-        //                 res.status(404).redirect("/login");
-        //             }
-        //         } else {
-        //             console.log('Email not found, redirecting the user back to the login page.');
-        //             // Display error codes appropriate to the error ie wrong password, no email etc.
-        //             res.status(404).redirect("/login");
-        //         }
-        //     } catch (error) {
-        //         console.error('Error:', error);
-        //         res.status(500).redirect("/");
-        //     }
-        // });
-
+                    bcrypt.compare(password, passwordToCheckAgainst, function (err, results) {
+                        if (err) {
+                            console.log("DEBUG: Error in password comparison at app.js: ", err);
+                            res.status(500).send();
+                        }
+                        if (results) {
+                            res.status(200).send();
+                            console.log("DEBUG: Passwords matching!");
+                        } else {
+                            console.log("DEBUG: Passwords do not match, reject user.");
+                            res.status(409).send();
+                        }
+                    })
+                } else {
+                    console.log('No user with that email exists.');
+                    res.status(404).send();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                res.status(500).send();
+            }
+        });
+        
         // app.put("/accountrecovery/changepassword", (req, res) => { TODO AFTER LOGIN IS SETUP.
 
         //     const { oldPassword, newPassword } = req.body;

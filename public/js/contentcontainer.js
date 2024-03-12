@@ -1,6 +1,7 @@
 import { isOpen } from './navbar.js';
 
 import { InitializeRegistrationLogic } from './registration.js';
+import { InitializeLoginLogic } from './login.js';
 
 const contentContainer = document.getElementById('content-container');
 
@@ -17,9 +18,10 @@ function UpdateContent(buttonId, result) { // The function to update our dynamic
             UpdateContainerRegister(); // Update the content of the container to display the registration 'page'.
             LoadRegistrationLogic(); // Load the registration logic after the content has been updated.
 
-        } else if (buttonId === "login") { // When we wish to update the container with the content relevant to the login 'page'.
+        } else if (buttonId === "login" || buttonId === "loginLink") { // When we wish to update the container with the content relevant to the login 'page'.
             console.log(`DEBUG: Displaying login tab.`);
             UpdateContainerLogin(); // Update the content of the container to display the login 'page'.
+            LoadLoginLogic();
 
         } else if (buttonId === "accountrecovery") { // When we wish to update the container with the content relevant to the account recovery 'page'.
             console.log(`DEBUG: Displaying Account Recovery Tab`);
@@ -36,6 +38,7 @@ function UpdateContent(buttonId, result) { // The function to update our dynamic
         } else if (buttonId === "login") {
             console.log(`DEBUG: Displaying login tab.`);
             UpdateContainerLogin();
+            LoadLoginLogic();
 
         } else if (buttonId === "accountrecovery") {
             console.log(`DEBUG: Displaying Account Recovery Tab`);
@@ -163,8 +166,6 @@ function UpdateContainerRegister() { // The function for updating the content in
     submitButton.textContent = 'Submit';
     registrationForm.appendChild(submitButton);
 
-
-
     // Create login button
     const loginButton = document.createElement('button');
     loginButton.textContent = 'Login Now!';
@@ -174,7 +175,7 @@ function UpdateContainerRegister() { // The function for updating the content in
     // Add event listener to the login button
     loginButton.addEventListener('click', function () {
         lastButtonId = 'login';
-        console.log(lastButtonId)
+        console.log(`DEBUG: ${lastButtonId}`)
         UpdateContent('login');
     });
 
@@ -300,8 +301,6 @@ function UpdateContainerLogin() { // The function for updating the content in th
     // Add event listener to the registration form if needed
     loginForm.addEventListener('submit', function (event) {
         event.preventDefault();
-        // Handle form submission logic
-        console.log(`DEBUG: Attempting to log in..`);
     });
 }
 function UpdateContainerRecovery() { // The function for updating the content in the dynamic content container to display the account recovery 'page'
@@ -516,6 +515,9 @@ function UpdateContainerRecovery() { // The function for updating the content in
 function LoadRegistrationLogic() { // The function that calls for the initialization of our registration logic. We call it again here so that we can better control timing between the creation of the form and the initialization of the logic ensuring that all necessary elements are created before they are requested.
     InitializeRegistrationLogic();
 }
+function LoadLoginLogic() {
+    InitializeLoginLogic();
+}
 document.addEventListener('DOMContentLoaded', function () { // Listen for the page to load.
     const container = document.getElementById('nav-organizer'); // Grab the navigational organizer (a transparent div element that contains our navigational buttons.)
     let buttons = container.querySelectorAll('button'); // Grab all buttons within that container.
@@ -526,7 +528,6 @@ document.addEventListener('DOMContentLoaded', function () { // Listen for the pa
         });
     });
 });
-
 document.addEventListener('toggleContainerResult', function (event) { // Listen for the toggleContainerResult event
     const result = event.detail;
 
