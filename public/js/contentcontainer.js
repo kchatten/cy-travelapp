@@ -7,7 +7,7 @@ const contentContainer = document.getElementById('content-container');
 
 let lastButtonId = null;
 
-function UpdateContent(buttonId, result) { // The function to update our dynamic content container, it takes in an input parameter of the id of the button clicked and outputs a result. I actually do not now why this works. Reading it as written, if the updateContent resolves successfully, it then proceeds to check the id of the button. If it fails, it wipes the screen and then checks the id of the button. If you remove the WupeContainer() from the else, forms will not be removed when navigating between tabs and they will inappropriately appear stacked within the content container,
+function UpdateContent(buttonId, result) { // The function to update our dynamic content container, it takes in an input parameter of the id of the button clicked and outputs a result. I actually do not now why this works. Reading it as written, if the updateContent resolves successfully, it then proceeds to check the id of the button. If it fails, it wipes the screen and then checks the id of the button. If you remove the WupeContainer() from the else, forms will not be removed when navigating between tabs and they will inappropriately appear stacked within the content container,S
 
     console.log(`DEBUG: running UpdateContent function with input parameter ${buttonId}`);
     console.log(`DEBUG: ${lastButtonId}`)

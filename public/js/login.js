@@ -23,7 +23,7 @@ export function InitializeLoginLogic() { // Function to initialize registration 
         errorMessage.textContent = ''; // Clear previous error messages
         errorMessage.style.color = 'red'; // Set the color.
     
-        if (!email || !password) { // Check that all fields have inputs.
+        if (!email || !Sword) { // Check that all fields have inputs.
             errorMessage.textContent = 'Please fill out all fields.';
         } else {    // Form is valid, proceed with submission
 
