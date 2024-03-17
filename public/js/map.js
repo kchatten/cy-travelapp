@@ -80,17 +80,3 @@ window.InitMap = async function (uLat, uLng) {
         console.warn("User location not yet retrieved.");
     }
 };
-
-
-
-
-
-
-
-// let mapScriptLoaded = false;
-
-
-
-// function GetUserLocationUnshared() {
-
-
