@@ -10,6 +10,8 @@ const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
+const jwt = require("jsonwebtoken");
+const token_key = "a1B2c3D4e5F6g7H8i9J10k11L12m13N14o15P16q17R18s19T20u21V22w23X24y25Z26"
 
 // MongoDB declarations
 
@@ -133,7 +135,12 @@ async function StartServer() {
                             res.status(500).send();
                         }
                         if (results) {
-                            res.status(200).send();
+                            // To add more information to the payload (the token) access them through the earlier declared 'user' variable.
+                            let userName = user.name;
+                            let userLocation = user.location;
+
+                            const token = jwt.sign({name: userName, email: email, location: userLocation }, `${token_key}`, { expiresIn: '1h' });
+                            res.status(200).json({ token: token });
                             console.log("DEBUG: Passwords matching!");
                         } else {
                             console.log("DEBUG: Passwords do not match, reject user.");
@@ -171,13 +178,28 @@ async function StartServer() {
     }
 }
 
-
 StartServer();
 
-/* 
-NOTES (Kyal) : the variables 'passwordlogin' and 'emaillogin' only need to be exclusively identified because both registration 
-and login forms exist on the same page at the moment. If they are moved the identifiers can also be removed and simplified.
-*/
+// Functions related to JWT verification.
+
+function VerifyToken(req, res, next) {
+    const token = req.headers['authorization'];
+
+    if (!token) {
+        return res.status(401).json({ message: 'Token is missing' });
+    }
+
+    jwt.verify(token, `${token_key}`, (err, decoded) => {
+        if (err) {
+            return res.status(401).json({ message: 'Token is invalid' });
+        }
+        req.user = decoded;
+        next();
+    });
+}
+
+
+
 
 
 module.exports.usersCollection = usersCollection;

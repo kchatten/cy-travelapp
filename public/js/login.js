@@ -23,7 +23,7 @@ export function InitializeLoginLogic() { // Function to initialize registration 
         errorMessage.textContent = ''; // Clear previous error messages
         errorMessage.style.color = 'red'; // Set the color.
     
-        if (!email || !Sword) { // Check that all fields have inputs.
+        if (!email || !password) { // Check that all fields have inputs.
             errorMessage.textContent = 'Please fill out all fields.';
         } else {    // Form is valid, proceed with submission
 
@@ -34,7 +34,12 @@ export function InitializeLoginLogic() { // Function to initialize registration 
             xhr.onload = function () { // Define what we want to happen when this request loads based on the response code we send back.
                 if (xhr.status === 200) { 
                     // TODO: Add logic for a successful request here (this will likely be firing the UpdateContainerLogin() function to direct the user to log in with their newly created account.)
-                   
+                
+                    let response = JSON.parse(xhr.responseText);
+                    let token = response.token;
+                    localStorage.setItem('token', token);
+                    console.log(`Token ${token} received from the server, storing in localStorage...`);
+                    
                     // Temporarily repurpose the error message div to display a success message. TODO: Remove this when the /login route is setup.
 
                     errorMessage.style.color = ''; // Reset the color.

@@ -1,5 +1,7 @@
 InitialzieGoogleMaps();
 
+// TODO: Solve no map panning
+
 function InitialzieGoogleMaps() { // This is the super function to control timing.
     console.log('Initializing Google Maps...')
     GoogleMapScript().then(() => { // 1. Load the Google Maps API script.
