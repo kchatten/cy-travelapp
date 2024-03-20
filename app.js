@@ -121,6 +121,7 @@ async function StartServer() {
                     console.log('User found:', result);
                     
                     const user = result[0]; // This should only ever return one result in the index so we are asking for the first result.
+                    console.log(user);
                     const passwordToCheckAgainst = user.password; // Set the password to match, to the password stored in the database for that particular user.
 
                     // DEBUGGING
@@ -138,8 +139,10 @@ async function StartServer() {
                             // To add more information to the payload (the token) access them through the earlier declared 'user' variable.
                             let userName = user.name;
                             let userLocation = user.location;
+                            let userId =  user._id.toString();
+                            console.log(userId);
 
-                            const token = jwt.sign({name: userName, email: email, location: userLocation }, `${token_key}`, { expiresIn: '1h' });
+                            const token = jwt.sign({userId: userId, name: userName, email: email, location: userLocation }, `${token_key}`, { expiresIn: '1h' });
                             res.status(200).json({ token: token });
                             console.log("DEBUG: Passwords matching!");
                         } else {
