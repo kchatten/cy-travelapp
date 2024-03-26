@@ -27,8 +27,25 @@ function PromptUserLocation() { // This is the function to prompt the user to sh
         console.log(uLat);
         console.log(uLng);
 
+        const input = document.getElementById('pac-input'); // Grab the input element that we wish to be our address lookup.
+        const options = {                                   // Define the options of our Autocomplete.
+            fields: ["address_components", "geometry", "icon", "name"],
+            strictBounds: false,
+        };
+
+        const autocomplete = new google.maps.places.Autocomplete(input, options); // Define a new autocomplete element where the input we defined earlier as the input element and the options we defined earlier as the options.
+        autocomplete.setFields(["place_id", "geometry", "name"]);
+        autocomplete.addListener("place_changed", function () {
+            const place = autocomplete.getPlace();
+            let uLat = place.geometry.location.lat();
+            let uLng = place.geometry.location.lng();       
+
+            InitMap(uLat, uLng);
+        });
+
         InitMap(uLat, uLng);
         mapCover.style.opacity = 0; // Hide the map cover.
+        
     }
 
     function Rejected() { // Handle the user rejecting our request to share location.

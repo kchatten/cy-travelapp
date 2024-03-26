@@ -160,7 +160,7 @@ async function StartServer() {
             }
         });
         
-        // app.put("/accountrecovery/changepassword", (req, res) => { TODO AFTER LOGIN IS SETUP.
+        // app.put("/accountrecovery/changepassword", (req, res) => {
 
         //     const { oldPassword, newPassword } = req.body;
 

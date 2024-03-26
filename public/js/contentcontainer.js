@@ -61,7 +61,7 @@ function ToggleContainer(buttonId) { // The function to toggle the container, it
         // If the buttonId does not match the lastButtonId, the user is trying to display the container.
         container.style.right = '0'; // Open the container
         console.log('DEBUG: Opening container...');
-    }    
+    }
     lastButtonId = buttonId; // Update lastButtonId.
 }
 function WipeContainer() { // The function for removing all content in the dynamic content container.
@@ -193,7 +193,7 @@ function UpdateContainerRegister() { // The function for updating the content in
 
     registrationForm.addEventListener('submit', function (event) {
         event.preventDefault();
-    });  
+    });
 }
 function UpdateContainerLogin() { // The function for updating the content in the dynamic content container to display the login 'page'
 
@@ -305,212 +305,228 @@ function UpdateContainerLogin() { // The function for updating the content in th
 }
 function UpdateContainerRecovery() { // The function for updating the content in the dynamic content container to display the account recovery 'page'
 
-    // Create recovery type form
-    const recoveryTypeForm = document.createElement('form');
-    recoveryTypeForm.id = 'recovery-type';
-    contentContainer.appendChild(recoveryTypeForm);
+    const token = localStorage.getItem('token');
 
-    // Create titleplate div
-    const titleplate = document.createElement('div');
-    titleplate.id = 'titleplate';
-    titleplate.style.display = 'flex';
-    titleplate.style.flexDirection = 'column';
-    titleplate.style.alignItems = 'center';
-    titleplate.marginBottom = '10px';
-    recoveryTypeForm.appendChild(titleplate);
+    if (!token) {
 
-    // Create logo image
-    const logo = document.createElement('img');
-    logo.src = 'https://i.ibb.co/CzX5Dt7/travelnest-logo.png';
-    logo.alt = 'Your Logo';
-    logo.classList.add('logo');
-    titleplate.appendChild(logo);
+           // Create error message div
+           const errorMessage = document.createElement('div');
+           errorMessage.id = 'error-message';
+           errorMessage.style.color = 'red';
+           errorMessage.style.fontSize = '16px';
+           contentContainer.appendChild(errorMessage);
+           errorMessage.textContent = "You're not logged in!";
 
-    // Create heading
-    const heading = document.createElement('h3');
-    heading.textContent = 'Account Recovery';
-    titleplate.appendChild(heading);
+        console.log("ERROR: JWT Does not exist");
+    } else {
 
-    // Create recovery type label
-    const recoveryTypeLabel = document.createElement('label');
-    recoveryTypeLabel.textContent = 'Recovery Type:';
-    recoveryTypeForm.appendChild(recoveryTypeLabel);
+        // Create recovery type form
+        const recoveryTypeForm = document.createElement('form');
+        recoveryTypeForm.id = 'recovery-type';
+        contentContainer.appendChild(recoveryTypeForm);
 
-    // Create recovery type dropdown
-    const recoveryTypeSelect = document.createElement('select');
-    recoveryTypeSelect.id = 'recovery-type-selected';
-    recoveryTypeSelect.name = 'recovery-type-selected';
-    recoveryTypeForm.appendChild(recoveryTypeSelect);
+        // Create titleplate div
+        const titleplate = document.createElement('div');
+        titleplate.id = 'titleplate';
+        titleplate.style.display = 'flex';
+        titleplate.style.flexDirection = 'column';
+        titleplate.style.alignItems = 'center';
+        titleplate.marginBottom = '10px';
+        recoveryTypeForm.appendChild(titleplate);
 
-    recoveryTypeSelect.addEventListener('change', function () {
-        const selectedOption = this.value;
-        if (selectedOption === 'password') {
-            passwordRecoveryForm.style.display = 'flex';
-            emailRecoveryForm.style.display = 'none';
-        } else if (selectedOption === 'email') {
-            passwordRecoveryForm.style.display = 'none';
-            emailRecoveryForm.style.display = 'flex';
-        } else {
-            // For other options, hide both forms
-            passwordRecoveryForm.style.display = 'none';
-            emailRecoveryForm.style.display = 'none';
-        }
-    });
+        // Create logo image
+        const logo = document.createElement('img');
+        logo.src = 'https://i.ibb.co/CzX5Dt7/travelnest-logo.png';
+        logo.alt = 'Your Logo';
+        logo.classList.add('logo');
+        titleplate.appendChild(logo);
 
-    // Create options for the dropdown
-    const optionClean = document.createElement('option');
-    optionClean.value = 'clean';
-    optionClean.textContent = 'Change something about my account...';
-    recoveryTypeSelect.appendChild(optionClean);
+        // Create heading
+        const heading = document.createElement('h3');
+        heading.textContent = 'Account Recovery';
+        titleplate.appendChild(heading);
 
-    const optionPassword = document.createElement('option');
-    optionPassword.value = 'password';
-    optionPassword.textContent = 'Change my password.';
-    recoveryTypeSelect.appendChild(optionPassword);
+        // Create recovery type label
+        const recoveryTypeLabel = document.createElement('label');
+        recoveryTypeLabel.textContent = 'Recovery Type:';
+        recoveryTypeForm.appendChild(recoveryTypeLabel);
 
-    const optionEmail = document.createElement('option');
-    optionEmail.value = 'email';
-    optionEmail.textContent = 'Change my email.';
-    recoveryTypeSelect.appendChild(optionEmail);
+        // Create recovery type dropdown
+        const recoveryTypeSelect = document.createElement('select');
+        recoveryTypeSelect.id = 'recovery-type-selected';
+        recoveryTypeSelect.name = 'recovery-type-selected';
+        recoveryTypeForm.appendChild(recoveryTypeSelect);
 
-    // Create password recovery form
-    const passwordRecoveryForm = document.createElement('form');
-    passwordRecoveryForm.id = 'recovery-container-password';
-    passwordRecoveryForm.style.flexDirection = 'column';
-    passwordRecoveryForm.style.justifySelf = 'center';
-    passwordRecoveryForm.style.alignItems = 'center';
-    passwordRecoveryForm.style.backgroundColor = 'white';
-    passwordRecoveryForm.style.width = '350px';
-    passwordRecoveryForm.style.padding = '10px';
-    passwordRecoveryForm.style.display = 'none';
-    contentContainer.appendChild(passwordRecoveryForm);
+        recoveryTypeSelect.addEventListener('change', function () {
+            const selectedOption = this.value;
+            if (selectedOption === 'password') {
+                passwordRecoveryForm.style.display = 'flex';
+                emailRecoveryForm.style.display = 'none';
+            } else if (selectedOption === 'email') {
+                passwordRecoveryForm.style.display = 'none';
+                emailRecoveryForm.style.display = 'flex';
+            } else {
+                // For other options, hide both forms
+                passwordRecoveryForm.style.display = 'none';
+                emailRecoveryForm.style.display = 'none';
+            }
+        });
 
-    // Create the content of the password recovery form.
+        // Create options for the dropdown
+        const optionClean = document.createElement('option');
+        optionClean.value = 'clean';
+        optionClean.textContent = 'Change something about my account...';
+        recoveryTypeSelect.appendChild(optionClean);
 
-    const newPasswordLabel = document.createElement('label'); // The new password.
-    newPasswordLabel.textContent = `New Password:`;
-    passwordRecoveryForm.appendChild(newPasswordLabel);
+        const optionPassword = document.createElement('option');
+        optionPassword.value = 'password';
+        optionPassword.textContent = 'Change my password.';
+        recoveryTypeSelect.appendChild(optionPassword);
 
-    const passwordRecoveryNewPasswordInput = document.createElement('input');
-    passwordRecoveryNewPasswordInput.id = 'password-recovery-new-password';
-    passwordRecoveryNewPasswordInput.setAttribute('type', 'password');
-    passwordRecoveryNewPasswordInput.setAttribute(`placeholder`, `Enter new password...`);
-    passwordRecoveryForm.appendChild(passwordRecoveryNewPasswordInput);
+        const optionEmail = document.createElement('option');
+        optionEmail.value = 'email';
+        optionEmail.textContent = 'Change my email.';
+        recoveryTypeSelect.appendChild(optionEmail);
 
-    const newPasswordConfirmLabel = document.createElement('label'); // The confirmed new password.
-    newPasswordConfirmLabel.textContent = `New Password:`;
-    passwordRecoveryForm.appendChild(newPasswordConfirmLabel);
+        // Create password recovery form
+        const passwordRecoveryForm = document.createElement('form');
+        passwordRecoveryForm.id = 'recovery-container-password';
+        passwordRecoveryForm.style.flexDirection = 'column';
+        passwordRecoveryForm.style.justifySelf = 'center';
+        passwordRecoveryForm.style.alignItems = 'center';
+        passwordRecoveryForm.style.backgroundColor = 'white';
+        passwordRecoveryForm.style.width = '350px';
+        passwordRecoveryForm.style.padding = '10px';
+        passwordRecoveryForm.style.display = 'none';
+        contentContainer.appendChild(passwordRecoveryForm);
 
-    const passwordRecoveryNewPasswordConfirmInput = document.createElement('input');
-    passwordRecoveryNewPasswordConfirmInput.id = 'password-recovery-confirm-new-password';
-    passwordRecoveryNewPasswordConfirmInput.setAttribute('type', 'password');
-    passwordRecoveryNewPasswordConfirmInput.setAttribute(`placeholder`, `Confirm new password...`);
-    passwordRecoveryForm.appendChild(passwordRecoveryNewPasswordConfirmInput);
+        // Create the content of the password recovery form.
 
-    const oldPasswordLabel = document.createElement('label'); // The old password.
-    oldPasswordLabel.textContent = `Old Password:`;
-    passwordRecoveryForm.appendChild(oldPasswordLabel);
+        const newPasswordLabel = document.createElement('label'); // The new password.
+        newPasswordLabel.textContent = `New Password:`;
+        passwordRecoveryForm.appendChild(newPasswordLabel);
 
-    const passwordRecoveryOldPasswordInput = document.createElement('input');
-    passwordRecoveryOldPasswordInput.id = 'password-recovery-old-password';
-    passwordRecoveryOldPasswordInput.setAttribute('type', 'password');
-    passwordRecoveryOldPasswordInput.setAttribute(`placeholder`, `Enter old password...`);
-    passwordRecoveryForm.appendChild(passwordRecoveryOldPasswordInput);
+        const passwordRecoveryNewPasswordInput = document.createElement('input');
+        passwordRecoveryNewPasswordInput.id = 'password-recovery-new-password';
+        passwordRecoveryNewPasswordInput.setAttribute('type', 'password');
+        passwordRecoveryNewPasswordInput.setAttribute(`placeholder`, `Enter new password...`);
+        passwordRecoveryForm.appendChild(passwordRecoveryNewPasswordInput);
 
-    const oldPasswordConfirmLabel = document.createElement('label'); // The confirmed old password.
-    oldPasswordConfirmLabel.textContent = `Confirm Old Password:`;
-    passwordRecoveryForm.appendChild(oldPasswordConfirmLabel);
+        const newPasswordConfirmLabel = document.createElement('label'); // The confirmed new password.
+        newPasswordConfirmLabel.textContent = `New Password:`;
+        passwordRecoveryForm.appendChild(newPasswordConfirmLabel);
 
-    const passwordRecoveryOldPasswordConfirmInput = document.createElement('input');
-    passwordRecoveryOldPasswordConfirmInput.id = 'password-recovery-confirm-old-password';
-    passwordRecoveryOldPasswordConfirmInput.setAttribute('type', 'password');
-    passwordRecoveryOldPasswordConfirmInput.setAttribute(`placeholder`, `Confirm old password...`);
-    passwordRecoveryForm.appendChild(passwordRecoveryOldPasswordConfirmInput);
+        const passwordRecoveryNewPasswordConfirmInput = document.createElement('input');
+        passwordRecoveryNewPasswordConfirmInput.id = 'password-recovery-confirm-new-password';
+        passwordRecoveryNewPasswordConfirmInput.setAttribute('type', 'password');
+        passwordRecoveryNewPasswordConfirmInput.setAttribute(`placeholder`, `Confirm new password...`);
+        passwordRecoveryForm.appendChild(passwordRecoveryNewPasswordConfirmInput);
 
-    // Create submit button
-    const passwordSubmitButton = document.createElement('button');
-    passwordSubmitButton.type = 'submit';
-    passwordSubmitButton.textContent = 'Submit';
-    passwordRecoveryForm.appendChild(passwordSubmitButton);
-    passwordRecoveryForm.addEventListener('submit', function (event) {
-        event.preventDefault();
-        // Handle form submission logic
-        console.log(`DEBUG: Attempting to change password..`);
-    });
+        const oldPasswordLabel = document.createElement('label'); // The old password.
+        oldPasswordLabel.textContent = `Old Password:`;
+        passwordRecoveryForm.appendChild(oldPasswordLabel);
 
-    // Create email recovery form
-    const emailRecoveryForm = document.createElement('form');
-    emailRecoveryForm.id = 'recovery-container-email';
-    emailRecoveryForm.style.flexDirection = 'column';
-    emailRecoveryForm.style.justifyContent = 'center';
-    emailRecoveryForm.style.alignItems = 'center';
-    emailRecoveryForm.style.backgroundColor = 'white';
-    emailRecoveryForm.style.width = '350px';
-    emailRecoveryForm.style.padding = '10px';
-    emailRecoveryForm.style.display = 'none';
-    contentContainer.appendChild(emailRecoveryForm);
+        const passwordRecoveryOldPasswordInput = document.createElement('input');
+        passwordRecoveryOldPasswordInput.id = 'password-recovery-old-password';
+        passwordRecoveryOldPasswordInput.setAttribute('type', 'password');
+        passwordRecoveryOldPasswordInput.setAttribute(`placeholder`, `Enter old password...`);
+        passwordRecoveryForm.appendChild(passwordRecoveryOldPasswordInput);
 
-    const newEmailLabel = document.createElement('label'); // The new email.
-    newEmailLabel.textContent = `New Email:`;
-    emailRecoveryForm.appendChild(newEmailLabel);
+        const oldPasswordConfirmLabel = document.createElement('label'); // The confirmed old password.
+        oldPasswordConfirmLabel.textContent = `Confirm Old Password:`;
+        passwordRecoveryForm.appendChild(oldPasswordConfirmLabel);
 
-    const newEmailInput = document.createElement('input');
-    newEmailInput.id = 'new-email-input';
-    newEmailInput.setAttribute('type', 'email');
-    newEmailInput.setAttribute('placeholder', 'Enter your new email...')
-    emailRecoveryForm.appendChild(newEmailInput);
+        const passwordRecoveryOldPasswordConfirmInput = document.createElement('input');
+        passwordRecoveryOldPasswordConfirmInput.id = 'password-recovery-confirm-old-password';
+        passwordRecoveryOldPasswordConfirmInput.setAttribute('type', 'password');
+        passwordRecoveryOldPasswordConfirmInput.setAttribute(`placeholder`, `Confirm old password...`);
+        passwordRecoveryForm.appendChild(passwordRecoveryOldPasswordConfirmInput);
 
-    const newEmailPasswordLabel = document.createElement('label'); // The new email.
-    newEmailPasswordLabel.textContent = `Confirm your password:`;
-    emailRecoveryForm.appendChild(newEmailPasswordLabel);
+        // Create submit button
+        const passwordSubmitButton = document.createElement('button');
+        passwordSubmitButton.type = 'submit';
+        passwordSubmitButton.textContent = 'Submit';
+        passwordRecoveryForm.appendChild(passwordSubmitButton);
+        passwordRecoveryForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            // Handle form submission logic
+            console.log(`DEBUG: Attempting to change password..`);
+        });
 
-    const newEmailPasswordInput = document.createElement('input');
-    newEmailPasswordInput.id = 'new-email-password-input';
-    newEmailPasswordInput.setAttribute('type', 'password');
-    newEmailPasswordInput.setAttribute('placeholder', 'Enter your current password...')
-    emailRecoveryForm.appendChild(newEmailPasswordInput);
+        // Create email recovery form
+        const emailRecoveryForm = document.createElement('form');
+        emailRecoveryForm.id = 'recovery-container-email';
+        emailRecoveryForm.style.flexDirection = 'column';
+        emailRecoveryForm.style.justifyContent = 'center';
+        emailRecoveryForm.style.alignItems = 'center';
+        emailRecoveryForm.style.backgroundColor = 'white';
+        emailRecoveryForm.style.width = '350px';
+        emailRecoveryForm.style.padding = '10px';
+        emailRecoveryForm.style.display = 'none';
+        contentContainer.appendChild(emailRecoveryForm);
 
-    // Create submit button
-    const emailSubmitButton = document.createElement('button');
-    emailSubmitButton.type = 'submit';
-    emailSubmitButton.textContent = 'Submit';
-    emailRecoveryForm.appendChild(emailSubmitButton);
-    emailRecoveryForm.addEventListener('submit', function (event) {
-        event.preventDefault();
-        // Handle form submission logic
-        console.log(`DEBUG: Attempting to change email..`);
-    });
+        const newEmailLabel = document.createElement('label'); // The new email.
+        newEmailLabel.textContent = `New Email:`;
+        emailRecoveryForm.appendChild(newEmailLabel);
 
+        const newEmailInput = document.createElement('input');
+        newEmailInput.id = 'new-email-input';
+        newEmailInput.setAttribute('type', 'email');
+        newEmailInput.setAttribute('placeholder', 'Enter your new email...')
+        emailRecoveryForm.appendChild(newEmailInput);
 
-    // Create link paragraph
-    const linkParagraph = document.createElement('div');
-    linkParagraph.classList.add('-link');
-    linkParagraph.textContent = 'Not signed up yet? ';
-    linkParagraph.style.marginTop = '10px';
-    contentContainer.appendChild(linkParagraph);
+        const newEmailPasswordLabel = document.createElement('label'); // The new email.
+        newEmailPasswordLabel.textContent = `Confirm your password:`;
+        emailRecoveryForm.appendChild(newEmailPasswordLabel);
 
-    // Create signup button
-    const signUpLink = document.createElement('button');
-    signUpLink.setAttribute('id', 'registerLink');
-    signUpLink.textContent = 'Sign up now';
-    signUpLink.style.backgroundColor = 'transparent';
-    signUpLink.style.border = 'none';
-    linkParagraph.appendChild(signUpLink);
+        const newEmailPasswordInput = document.createElement('input');
+        newEmailPasswordInput.id = 'new-email-password-input';
+        newEmailPasswordInput.setAttribute('type', 'password');
+        newEmailPasswordInput.setAttribute('placeholder', 'Enter your current password...')
+        emailRecoveryForm.appendChild(newEmailPasswordInput);
 
-    // Create error message div
-    const errorMessage = document.createElement('div');
-    errorMessage.id = 'error-message';
-    errorMessage.style.color = 'red';
-    errorMessage.style.fontSize = '16px';
-    recoveryTypeForm.appendChild(errorMessage);
+        // Create submit button
+        const emailSubmitButton = document.createElement('button');
+        emailSubmitButton.type = 'submit';
+        emailSubmitButton.textContent = 'Submit';
+        emailRecoveryForm.appendChild(emailSubmitButton);
+        emailRecoveryForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            // Handle form submission logic
+            console.log(`DEBUG: Attempting to change email..`);
+        });
 
 
-    // Add event listener to the sign up link
-    signUpLink.addEventListener('click', function () {
-        lastButtonId = 'registerLink';
-        console.log(lastButtonId)
-        UpdateContent('registerLink');
-    });
+        // Create link paragraph
+        const linkParagraph = document.createElement('div');
+        linkParagraph.classList.add('-link');
+        linkParagraph.textContent = 'Not signed up yet? ';
+        linkParagraph.style.marginTop = '10px';
+        contentContainer.appendChild(linkParagraph);
+
+        // Create signup button
+        const signUpLink = document.createElement('button');
+        signUpLink.setAttribute('id', 'registerLink');
+        signUpLink.textContent = 'Sign up now';
+        signUpLink.style.backgroundColor = 'transparent';
+        signUpLink.style.border = 'none';
+        linkParagraph.appendChild(signUpLink);
+
+        // Create error message div
+        const errorMessage = document.createElement('div');
+        errorMessage.id = 'error-message';
+        errorMessage.style.color = 'red';
+        errorMessage.style.fontSize = '16px';
+        recoveryTypeForm.appendChild(errorMessage);
+
+
+        // Add event listener to the sign up link
+        signUpLink.addEventListener('click', function () {
+            lastButtonId = 'registerLink';
+            console.log(lastButtonId)
+            UpdateContent('registerLink');
+        });
+    }
 }
 function LoadRegistrationLogic() { // The function that calls for the initialization of our registration logic. We call it again here so that we can better control timing between the creation of the form and the initialization of the logic ensuring that all necessary elements are created before they are requested.
     InitializeRegistrationLogic();
