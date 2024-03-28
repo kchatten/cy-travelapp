@@ -53,7 +53,6 @@ function PromptUserLocation() { // This is the function to prompt the user to sh
         console.log('Rejected!');
 
         let mapContainer = document.getElementById('map-container'); // As we are covering the map, it makes sense to add it to the map container.
-        mapContainer.appendChild(mapCover);
 
         const input = document.getElementById('pac-input'); // Grab the input element that we wish to be our address lookup.
         const options = {                                   // Define the options of our Autocomplete.
