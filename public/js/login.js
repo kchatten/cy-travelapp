@@ -48,13 +48,13 @@ export function InitializeLoginLogic() { // Function to initialize registration 
                     errorMessage.style.color = '#000'; // Set the color.
                     errorMessage.textContent = 'Logged in!'; // Set the text content.
 
-                } else if (xhr.status === 409) {
+                } else if (xhr.status === 404) {
                     errorMessage.style.color = 'red';
                     errorMessage.textContent = 'No accounts with those credentials exist.'; // When we recieve a 409 conflict error indicating the user is attempting to register with an email that already exists within the database.
                 } else {
                     errorMessage.textContent = 'Unhandled error'; // When we recieve any response that is not a success (200) or an expected duplicate email conflict error (409). If this message ever is displayed, further investigation is required.
                 }
-            };
+            };  
             var jsonData = JSON.stringify(formData); // Convert formData to JSON string
             console.log('DEBUG (user information json object from registration.js): ', jsonData);
             xhr.send(jsonData); // Send the stringified JSON data as our request.

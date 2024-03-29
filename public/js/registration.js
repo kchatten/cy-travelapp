@@ -22,7 +22,6 @@ export function InitializeRegistrationLogic() { // Function to initialize regist
             password: hashedPassword, // Hash the password and send it to the server. This means the password that the user inputs never leaves this script unencrypted.
             location: location
         };
-    
      
         const errorMessage = document.getElementById('error-message'); // Grab the div to display any error messages.
         errorMessage.textContent = ''; // Clear previous error messages

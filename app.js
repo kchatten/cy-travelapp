@@ -68,7 +68,13 @@ async function StartServer() {
             res.render(`index`);
         });
 
-
+        app.get("/accountrecovery/password", (req, res) => {
+            try {
+                res.send(VerifyToken(req, res));
+            } catch (error) {
+                res.status(401).send("Unauthorized: Token verification failed");
+            }
+        });
         // POST declarations
 
         app.post("/register", async (req, res) => { // This request is sent from registration.js
@@ -77,17 +83,17 @@ async function StartServer() {
 
                 const cursor = await usersCollection.find({ email: email }); // Compare the email from our request against our database. This returns a cursor.
                 const result = await cursor.toArray(); // To access the values within the cursor we must turn it into an array.
-        
+
                 if (result.length > 0) { // If the length of our result is greater than 0, that indicates that we have found a matching email.
                     console.log("Email already exists");
                     return res.status(409).send('An account with that email already exists.'); // Send a conflict error status code with the appropriate error message we wish to display to the user.
                 } else { // The length of result is 0 which indicates there are no matching emails in our database.
-                  
+
                     bcrypt.hash(password, saltRounds, async function (err, hashedPassword) {   // Use bcrypt to hash the password of our request. Store that hashed result as the hashedPassword variable.
                         if (err) { // Handle the error gracefully.
                             console.error("Error hashing password:", err);
                             return res.status(500).send("An error occurred while hashing the password."); // This should never happen, it indicates a critical error with the bcrypt module. Ensure that bcrypt is up to date and appropriately required at the top of this script, that saltRounds is appropriately defined and that the password variable is correctly being passed from registration.js as a sha256 string.
-                        }      
+                        }
                         try { // Attempt to write to our database.
                             const resultToInsert = await usersCollection.insertOne({ // Debugging information, technically we can remove 'const resultToInsert = await' and just run the mongosh command collName.insertOne to insert the information into the database.
                                 name: name,
@@ -108,10 +114,10 @@ async function StartServer() {
                 res.status(500).send("An error occurred while registering the user.");
             }
         });
-        
 
-        app.post("/login", async (req, res) => { 
-            try{
+
+        app.post("/login", async (req, res) => {
+            try {
                 const { email, password } = req.body; // Pull the login form data from our request body.
                 const cursor = usersCollection.find({ email: email }); // Find documents matching the query. MongoDB returns .find() objects as a cursor which must be converted into an array.        
                 const result = await cursor.toArray(); // Convert the cursor to an array of documents
@@ -119,7 +125,7 @@ async function StartServer() {
                 // If the length of our result is greater than 0, the email was found in usersCollection.
                 if (result.length > 0) {
                     console.log('User found:', result);
-                    
+
                     const user = result[0]; // This should only ever return one result in the index so we are asking for the first result.
                     console.log(user);
                     const passwordToCheckAgainst = user.password; // Set the password to match, to the password stored in the database for that particular user.
@@ -139,10 +145,10 @@ async function StartServer() {
                             // To add more information to the payload (the token) access them through the earlier declared 'user' variable.
                             let userName = user.name;
                             let userLocation = user.location;
-                            let userId =  user._id.toString();
+                            let userId = user._id.toString();
                             console.log(userId);
 
-                            const token = jwt.sign({userId: userId, name: userName, email: email, location: userLocation }, `${token_key}`, { expiresIn: '1h' });
+                            const token = jwt.sign({ userId: userId, name: userName, email: email, location: userLocation }, `${token_key}`, { expiresIn: '1h' });
                             res.status(200).json({ token: token });
                             console.log("DEBUG: Passwords matching!");
                         } else {
@@ -159,13 +165,16 @@ async function StartServer() {
                 res.status(500).send();
             }
         });
-        
-        // app.put("/accountrecovery/changepassword", (req, res) => {
 
-        //     const { oldPassword, newPassword } = req.body;
 
-        // });
-
+        app.put("/accountrecovery/changepassword", async (req, res) => {
+            try {
+                const { userId, currentPassword, newPassword } = req.body;
+                
+            } catch {
+                
+            }
+        });
         // app.put("/accountrecovery/changeemail", (req, res) => { TODO AFTER LOGIN IS SETUP
 
         //     const { oldEmail, newEmail } = req.body;
@@ -185,24 +194,31 @@ StartServer();
 
 // Functions related to JWT verification.
 
-function VerifyToken(req, res, next) {
-    const token = req.headers['authorization'];
+function VerifyToken(req, res) {
+    const authHeader = req.headers.authorization;
+    console.log('Authorization Header:', authHeader); // Log the entire authorization header
 
-    if (!token) {
-        return res.status(401).json({ message: 'Token is missing' });
+    if (!authHeader) {
+        console.log('Authorization header not found');
+        return res.status(401).send({ message: 'Unauthorized: Authorization header is missing' });
     }
 
-    jwt.verify(token, `${token_key}`, (err, decoded) => {
+    const tokenParts = authHeader.split(' ');
+    if (tokenParts.length !== 2 || tokenParts[0] !== 'Bearer') {
+        console.log('Invalid authorization header format');
+        return res.status(401).send({ message: 'Unauthorized: Invalid authorization header format' });
+    }
+
+    const token = tokenParts[1];
+    console.log('Extracted Token:', token); // Log the extracted token
+
+    jwt.verify(token, token_key, (err, decoded) => {
         if (err) {
-            return res.status(401).json({ message: 'Token is invalid' });
+            console.error('Error verifying token:', err); // Log the error encountered during token verification
+            return res.status(401).send({ message: 'Unauthorized: Token is invalid' });
         }
-        req.user = decoded;
-        next();
+        console.log('Decoded Token:', decoded); // Log the decoded token payload
+        // If token verification is successful, you can send back the decoded token information
+        return res.status(200).send(decoded);
     });
 }
-
-
-
-
-
-module.exports.usersCollection = usersCollection;

@@ -3,6 +3,8 @@ import { isOpen } from './navbar.js';
 import { InitializeRegistrationLogic } from './registration.js';
 import { InitializeLoginLogic } from './login.js';
 
+
+
 const contentContainer = document.getElementById('content-container');
 
 let lastButtonId = null;
@@ -26,6 +28,9 @@ function UpdateContent(buttonId, result) { // The function to update our dynamic
         } else if (buttonId === "accountrecovery") { // When we wish to update the container with the content relevant to the account recovery 'page'.
             console.log(`DEBUG: Displaying Account Recovery Tab`);
             UpdateContainerRecovery() // Update the content of the container to display the account recovery 'page'.
+        } else if (buttonId === "profile") {
+            console.log("DEBUG: Displaying Profile tab.")
+            UpdateContainerProfile();
         }
     } else { // Updates the container while it is onscreen.
         WipeContainer();
@@ -44,6 +49,9 @@ function UpdateContent(buttonId, result) { // The function to update our dynamic
             console.log(`DEBUG: Displaying Account Recovery Tab`);
 
             UpdateContainerRecovery()
+        } else if (buttonId === "profile") {
+            console.log("DEBUG: Displaying Profile tab.")
+            UpdateContainerProfile();
         }
     }
 }
@@ -85,7 +93,7 @@ function UpdateContainerRegister() { // The function for updating the content in
     titleplate.style.display = 'flex';
     titleplate.style.flexDirection = 'column';
     titleplate.style.alignItems = 'center';
-    titleplate.marginBottom = '10px';
+    titleplate.style.marginBottom = '10px';
     registrationForm.appendChild(titleplate);
 
     // Create image element
@@ -215,7 +223,7 @@ function UpdateContainerLogin() { // The function for updating the content in th
     titleplate.style.display = 'flex';
     titleplate.style.flexDirection = 'column';
     titleplate.style.alignItems = 'center';
-    titleplate.marginBottom = '10px';
+    titleplate.style.marginBottom = '10px';
     loginForm.appendChild(titleplate);
 
     // Create image element
@@ -303,21 +311,87 @@ function UpdateContainerLogin() { // The function for updating the content in th
         event.preventDefault();
     });
 }
+function UpdateContainerProfile() {
+    const profileContainer = document.createElement('div'); // Create container div
+    profileContainer.classList.add('container'); // Give it the class .container for styling purposes.
+    profileContainer.style.backgroundColor = "#fff";
+
+    contentContainer.appendChild(profileContainer);
+
+    // Create titleplate div
+    const titleplate = document.createElement('div');
+    titleplate.id = 'titleplate';
+    titleplate.style.display = 'flex';
+    titleplate.style.flexDirection = 'column';
+    titleplate.style.alignItems = 'center';
+    titleplate.style.marginBottom = '10px';
+    titleplate.style.marginTop = "5px";
+    profileContainer.appendChild(titleplate);
+
+    // Create image element
+    const logo = document.createElement('img');
+    logo.src = 'https://i.ibb.co/CzX5Dt7/travelnest-logo.png';
+    logo.alt = 'Your Logo';
+    logo.classList.add('logo');
+    titleplate.appendChild(logo);
+
+    // Create h6 element
+    const heading6 = document.createElement('h6');
+    heading6.textContent = 'Travel near. Travel far.';
+    titleplate.appendChild(heading6);
+
+    const userContainer = document.createElement('div');
+    userContainer.classList.add('container');
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/accountrecovery/password', true);
+    let token = localStorage.getItem('token');
+    console.log('Token:', token); // Log the token value
+    if (token) {
+        xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+    } else {
+        console.log('Token not found in localStorage');
+        // Handle the case where token is not found, possibly redirect to login or display an error message.
+        return;
+    }
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            let user;
+            try {
+                user = JSON.parse(xhr.responseText);
+                // Update profile information
+                // For example, assuming user object has name and email fields:
+                const userName = document.createElement('h2');
+                userName.textContent = `Hello ${user.name}!`;
+                profileContainer.appendChild(userName);
+            } catch (error) {
+                console.error('Error parsing response:', error);
+            }
+            console.log("DEBUG: Profile retrieved.")
+        } else if (xhr.status === 401) {
+            console.log('Authorization Denied');
+        } else {
+            console.log('Unhandled error');
+        }
+    };
+    xhr.send();
+}
 function UpdateContainerRecovery() { // The function for updating the content in the dynamic content container to display the account recovery 'page'
 
     const token = localStorage.getItem('token');
 
     if (!token) {
 
-           // Create error message div
-           const errorMessage = document.createElement('div');
-           errorMessage.id = 'error-message';
-           errorMessage.style.color = 'red';
-           errorMessage.style.fontSize = '16px';
-           contentContainer.appendChild(errorMessage);
-           errorMessage.textContent = "You're not logged in!";
+        // Create error message div
+        const errorMessage = document.createElement('div');
+        errorMessage.id = 'error-message';
+        errorMessage.style.color = 'red';
+        errorMessage.style.fontSize = '16px';
+        contentContainer.appendChild(errorMessage);
+        errorMessage.textContent = "You're not logged in!";
 
         console.log("ERROR: JWT Does not exist");
+
     } else {
 
         // Create recovery type form
@@ -331,7 +405,7 @@ function UpdateContainerRecovery() { // The function for updating the content in
         titleplate.style.display = 'flex';
         titleplate.style.flexDirection = 'column';
         titleplate.style.alignItems = 'center';
-        titleplate.marginBottom = '10px';
+        titleplate.style.marginBottom = '10px';
         recoveryTypeForm.appendChild(titleplate);
 
         // Create logo image
@@ -449,10 +523,9 @@ function UpdateContainerRecovery() { // The function for updating the content in
         passwordRecoveryForm.appendChild(passwordSubmitButton);
         passwordRecoveryForm.addEventListener('submit', function (event) {
             event.preventDefault();
-            // Handle form submission logic
             console.log(`DEBUG: Attempting to change password..`);
         });
-
+s
         // Create email recovery form
         const emailRecoveryForm = document.createElement('form');
         emailRecoveryForm.id = 'recovery-container-email';
