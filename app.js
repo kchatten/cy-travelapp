@@ -28,14 +28,14 @@ const userSchema = new Schema({
 let usersCollection;
 
 async function ConnectToMongoDB() {
-    try {
-        await client.connect();
-        const database = client.db('cyta');
-        usersCollection = database.collection('users');
-        console.log('Connected to MongoDB');
-    } catch (error) {
-        console.error('Error connecting to MongoDB:', error);
-    }
+    // try {
+    //     await client.connect();
+    //     const database = client.db('cyta');
+    //     usersCollection = database.collection('users');
+    //     console.log('Connected to MongoDB');
+    // } catch (error) {
+    //     console.error('Error connecting to MongoDB:', error);
+    // }
 }
 
 // SERVER declarations
